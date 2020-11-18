@@ -16,7 +16,7 @@ function List(props){
     const [toList, setToList] = useState(data.slice(0, 20));
     const [point, setPoint] = useState(20);
 
-    //Run when props.list change. Re-initialize state
+    //Run when props.list (or props.category to be precise) change. Re-initialize state
     useEffect(()=>{
         if (props.list){
             setCategory(props.category);
@@ -25,6 +25,8 @@ function List(props){
             setToList(props.list.slice(0, 20));
             setIsReady(true);
             setHasMore(true);
+
+            //Set icon for product category
             if (props.category == "jackets")
                 setProductIcon(faUserTie);
             else if (props.category == "shirts")
@@ -60,26 +62,31 @@ function List(props){
     }
 
     const checkAvailability = (id, manu, listIndex) =>{
+        //Set button with index = listIndex as "Checking..."
         let newBtnArray = availableBtn.slice();
         newBtnArray[listIndex] = "Checking...";
         setAvailableBtn(newBtnArray);
+
+        //Requests APIs to check availability
         axios({
-            url: "http://bad-api-assignment.reaktor.com/availability/"+manu,
+            url: "https://bad-api-assignment.reaktor.com/availability/"+manu,
             headers: {
                 'Content-Type': 'application/json',
                 // 'x-force-error-mode': 'all'
             },
         }).then(result => {return result.data}).then(data=>{
             let avail = data.response;
-            if (typeof avail == "string"){
-                //alert("NO INFORMATION. TRY TO FETCH AGAIN");
+            if (typeof avail == "string"){  //If response = '[]' then error
+                //Set button text to Error message
                 let newBtnArray = availableBtn.slice();
                 newBtnArray[listIndex] = "ERROR. CLICK TO TRY AGAIN";
                 setAvailableBtn(newBtnArray);
             }
             else{
+                //If found availability list by manufacturer
                 avail.forEach((item, index) => {
-                    if (item.id == id.toUpperCase()){
+                    if (item.id == id.toUpperCase()){   //If match
+                        //Set button text to product status
                         let newBtnArray = availableBtn.slice();
                         newBtnArray[listIndex] = item.DATAPAYLOAD.slice(31, -31);
                         setAvailableBtn(newBtnArray);
@@ -118,9 +125,9 @@ function List(props){
     }
 
 const mapStateToProps = (state, ownProps) => {
-    const category = ownProps.category;
+    const category = ownProps.category; //Update props.list when props.category change
     return{
-        list: state.products.products_list[category],
+        list: state.products.products_list[category],   //Get product by category
     }
 }
 

@@ -17,8 +17,11 @@ function HomePage(){
                 <br/><br/><br/><br/>
             </div>
             <p>Use the Navbar above to navigate to products list area</p>
-            <p className="w3-center w3-white">
+            <p>
                 Powered by <a href="http://reactjs.org/">ReactJS</a>, <a href="https://www.w3schools.com/w3css/default.asp">W3.CSS</a>, <a href="https://react-redux.js.org/">React Redux</a>
+            </p>
+            <p>
+                Find me on <a href="https://github.com/theanhhds/okrater">Github</a>
             </p>
         </div>
     );

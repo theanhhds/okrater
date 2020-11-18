@@ -6,6 +6,7 @@ function Tag(props){
 
     let [btnColor, setBtnColor] = useState(" w3-green ");
 
+    //Run this effect when props.btnText changes
     useEffect(()=>{
         switch (props.btnText){
             case "ERROR. CLICK TO TRY AGAIN":
