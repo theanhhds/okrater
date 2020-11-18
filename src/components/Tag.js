@@ -26,7 +26,7 @@ function Tag(props){
     }, [props.btnText]);
 
     return(
-        <div key={props.index} className="w3-row w3-margin w3-card w3-pale-green w3-padding">
+        <div key={props.index} className="w3-row w3-margin w3-card w3-pale-green w3-padding" >
             <div className="w3-col s4 w3-jumbo w3-center">
                 <FontAwesomeIcon icon={props.productIcon} size="lg"/>
             </div>
