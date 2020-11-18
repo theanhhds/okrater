@@ -1,5 +1,6 @@
 ## This is for Reaktor Junior assignment
-You can find the assignment [here](https://www.reaktor.com/junior-dev-assignment/)
+You can find the assignment [here](https://www.reaktor.com/junior-dev-assignment/). \
+The link to the solution can be found at [https://okrater-store.web.app/](https://okrater-store.web.app/) \
 
 # Getting Started with Create React App
 
