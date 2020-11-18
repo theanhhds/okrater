@@ -3,17 +3,17 @@ import axios from 'axios';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 
 import { connect } from 'react-redux';
-import { actSetProductByCateogry, actSetAvailabilityByManufacturer } from '../redux/actions/productsAction';
+import { actSetProductByCateogry } from '../redux/actions/productsAction';
 
 import NavBar from './NavBar';
 import Listing from './List';
 import ScrollToTop from './scroll';
-
+import HomePage from './HomePage';
+import ErrorPage from './ErrorPage';
 function Main(props){
 
     const productTypes = ["jackets", "shirts", "accessories"];
-    const manufacturers = ["xoon", "reps", "nouke", "derp", "abiplos"];
-
+    
     //Get a list of product by category
     const getProduct = (product) =>{
         axios({
@@ -26,34 +26,16 @@ function Main(props){
         }).then((result)=>{
             return result.data
         }).then((data)=>{
-            props.setProductByCateogry(product, data);
+            if (data.length != 0){
+                props.setProductByCateogry(product, data);
+            }
         });
-    }
-
-    //Get a list of availability by manufacturer
-    const getAvailability = (manufacturer) =>{
-        axios({
-            method: 'get',
-            url: 'https://bad-api-assignment.reaktor.com/availability/' + manufacturer,
-            headers: {
-                'Content-Type': 'application/json',
-                // 'x-force-error-mode': 'all'
-            },
-        }).then((result) => {
-            return result.data
-        }).then((data) => {
-            props.setAvailabilityByManufacturer(manufacturer, data.response);
-        })
     }
 
     //Run this effect when componentDidMount
     useEffect(()=>{
         productTypes.forEach((item, index) => {
             getProduct(item);
-        });
-
-        manufacturers.forEach((item, index)=>{
-            getAvailability(item);
         });
     }, []);
 
@@ -64,6 +46,7 @@ function Main(props){
                 <br/><br/>
                 <ScrollToTop>
                 <Switch>
+                    <Route path='/' exact component={HomePage} />
                     <Route path='/jackets' exact>
                         <Listing category="jackets" />
                     </Route>
@@ -73,6 +56,7 @@ function Main(props){
                     <Route path='/accessories' exact>
                         <Listing category="accessories" />
                     </Route>
+                    <Route component={ErrorPage} />
                 </Switch>
                 </ScrollToTop>
             </BrowserRouter>
@@ -84,10 +68,6 @@ const mapDispatchToProps = dispatch => {
     return {
         setProductByCateogry: (category, value) => {
             dispatch(actSetProductByCateogry(category, value));
-        },
-
-        setAvailabilityByManufacturer: (manufacturer, value) => {
-            dispatch(actSetAvailabilityByManufacturer(manufacturer, value))
         }
     }
 }

@@ -9,13 +9,3 @@ export const actSetProductByCateogry = (category, value) => {
         }
     }
 }
-
-export const actSetAvailabilityByManufacturer = (manufacturer, value) => {
-    return {
-        type: ActionType.SET_AVAILABILITY_BY_MANUFACTURER,
-        payload: {
-            manufacturer_name: manufacturer,
-            value: value,
-        }
-    };
-}

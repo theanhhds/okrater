@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import InfiniteScroll from 'react-infinite-scroller';
 import { faTshirt, faHatCowboy, faUserTie, faCircle } from '@fortawesome/free-solid-svg-icons';
 import Tag from './Tag';
+import axios from 'axios';
 
 function List(props){
 
@@ -10,10 +11,14 @@ function List(props){
     const [productIcon, setProductIcon] = useState();
     const [data, setData] = useState([]);
     const [isReady, setIsReady] = useState(false);
+    const [availableBtn, setAvailableBtn] = useState([]);
+    const [hasMore, setHasMore] = useState(true);
+    const [toList, setToList] = useState(data.slice(0, 20));
+    const [point, setPoint] = useState(20);
 
+    //Run when props.list change. Re-initialize state
     useEffect(()=>{
         if (props.list){
-            // console.log("props.list runs");
             setCategory(props.category);
             setData(props.list.slice());
             setPoint(20);
@@ -26,34 +31,61 @@ function List(props){
                 setProductIcon(faTshirt);
             else
                 setProductIcon(faHatCowboy);
+
+            //Set available buttons
+            let i, newBtnArray = new Array();
+            for (i=0; i<20; i++){
+                newBtnArray.push("Check availability");
+            }
+            setAvailableBtn(newBtnArray);
         }
     }, [props.list]);
 
-
-    const [hasMore, setHasMore] = useState(true);
-    const [toList, setToList] = useState(data.slice(0, 20));
-    const [point, setPoint] = useState(20);
-    
     const getMoreData = () => {
         if ((toList.length === data.length) && isReady){
             setHasMore(false);
             return;
         }
-
-        if (isReady)
-        {
+        if (isReady){
             setTimeout(()=>{
                 setToList(data.slice(0, point + 20));
-                setPoint((prev) => (prev + 20));                
+                let i, newBtnArray = availableBtn.slice();
+                for (i=point+1; i<point+20; i++){
+                    newBtnArray.push("Check availability");
+                }
+                setAvailableBtn(newBtnArray);
+                setPoint((prev) => (prev + 20));
             }, 500);
         }
     }
 
-    const checkAvailability = (id, manu) =>{
-        let avail_list_by_manu = props.avail[manu];
-        avail_list_by_manu.forEach((item, index)=>{
-            if (id.toUpperCase() == item.id)
-                alert(item.DATAPAYLOAD.slice(31, -31));
+    const checkAvailability = (id, manu, listIndex) =>{
+        let newBtnArray = availableBtn.slice();
+        newBtnArray[listIndex] = "Checking...";
+        setAvailableBtn(newBtnArray);
+        axios({
+            url: "http://bad-api-assignment.reaktor.com/availability/"+manu,
+            headers: {
+                'Content-Type': 'application/json',
+                // 'x-force-error-mode': 'all'
+            },
+        }).then(result => {return result.data}).then(data=>{
+            let avail = data.response;
+            if (typeof avail == "string"){
+                //alert("NO INFORMATION. TRY TO FETCH AGAIN");
+                let newBtnArray = availableBtn.slice();
+                newBtnArray[listIndex] = "ERROR. CLICK TO TRY AGAIN";
+                setAvailableBtn(newBtnArray);
+            }
+            else{
+                avail.forEach((item, index) => {
+                    if (item.id == id.toUpperCase()){
+                        let newBtnArray = availableBtn.slice();
+                        newBtnArray[listIndex] = item.DATAPAYLOAD.slice(31, -31);
+                        setAvailableBtn(newBtnArray);
+                    }
+                });
+            }
         });
     }
 
@@ -65,11 +97,18 @@ function List(props){
                 loadMore={getMoreData}
                 hasMore={hasMore}
                 loader={<h2 className="w3-center">Loading...</h2>}
+                threshold={100}
             >
                 {
                     toList.map((item, index) => {
                         return (
-                            <Tag index={index} productIcon={productIcon} item={item} checkAvailability={checkAvailability}/>
+                            <Tag 
+                                index={index} 
+                                btnText={availableBtn[index]} 
+                                productIcon={productIcon} 
+                                item={item} 
+                                checkAvailability={checkAvailability}
+                            />
                         );
                     })
                 }
@@ -82,7 +121,6 @@ const mapStateToProps = (state, ownProps) => {
     const category = ownProps.category;
     return{
         list: state.products.products_list[category],
-        avail: state.products.availability_list
     }
 }
 

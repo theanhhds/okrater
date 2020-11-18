@@ -2,7 +2,7 @@ import * as ActionType from '../constants/productsConstant';
 
 
 // productTypes = ["jackets", "shirts", "accessories"]
-// manufacturers = ["xoon", "reps", "nouke", "derp", "abiplos"];
+
 const initialState = {
     products_list : {
         
@@ -23,17 +23,6 @@ export const productsReducer = (state = initialState, action) => {
             return {...state, 
                     products_list: products
             }
-
-        case ActionType.SET_AVAILABILITY_BY_MANUFACTURER:
-            let manufacturer = action.payload.manufacturer_name;
-            let availability_value = action.payload.value;
-            let availability = state.availability_list;
-            availability[manufacturer] = availability_value;
-
-            return {...state,
-                    availability_list: availability
-            }
-
         default:
             return {...state}
     }
