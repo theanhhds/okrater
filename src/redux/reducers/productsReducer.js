@@ -1,0 +1,41 @@
+import * as ActionType from '../constants/productsConstant';
+
+
+// productTypes = ["jackets", "shirts", "accessories"]
+// manufacturers = ["xoon", "reps", "nouke", "derp", "abiplos"];
+const initialState = {
+    products_list : {
+        
+    },
+    availability_list: {
+       
+    },
+}
+
+export const productsReducer = (state = initialState, action) => {
+    switch (action.type){
+        case ActionType.SET_PRODUCT_BY_CATEGORY:
+            let category = action.payload.category_name;
+            let products_value = action.payload.value;
+            let products = state.products_list;
+            products[category] = products_value;
+
+            return {...state, 
+                    products_list: products
+            }
+
+        case ActionType.SET_AVAILABILITY_BY_MANUFACTURER:
+            let manufacturer = action.payload.manufacturer_name;
+            let availability_value = action.payload.value;
+            let availability = state.availability_list;
+            availability[manufacturer] = availability_value;
+
+            return {...state,
+                    availability_list: availability
+            }
+
+        default:
+            return {...state}
+    }
+    return {...state}
+}
